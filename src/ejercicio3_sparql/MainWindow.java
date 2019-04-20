@@ -365,8 +365,9 @@ public class MainWindow extends javax.swing.JFrame {
     private ResultSet executeRemoteQuery(String queryString, String url) {
         ResultSet resultAux;
         ResultSet result = null;
-        Query query = QueryFactory.create(queryString);
-        try (QueryExecution execution = QueryExecutionFactory.sparqlService(url, query)) {
+        try {
+            Query query = QueryFactory.create(queryString);
+            QueryExecution execution = QueryExecutionFactory.sparqlService(url, query);
             ((QueryEngineHTTP) execution).addParam("timeout", "10000");
             resultAux = execution.execSelect();
             result = ResultSetFactory.copyResults(resultAux);
