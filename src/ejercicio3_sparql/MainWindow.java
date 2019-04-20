@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.apache.http.HttpException;
 import org.apache.jena.atlas.logging.LogCtl;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -31,8 +30,8 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         initComponents();
         LogCtl.setCmdLogging();
-//        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\palaeontology_articles-reducido\\palaeontology_articles-reducido.rdf");                
-        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\datos-ejemplo-sparql\\datos-sparql-2018-19.ttl");
+        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\palaeontology_articles-reducido\\palaeontology_articles-reducido.rdf");                
+//        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\datos-ejemplo-sparql\\datos-sparql-2018-19.ttl");
     }
 
     @SuppressWarnings("unchecked")
@@ -355,6 +354,8 @@ public class MainWindow extends javax.swing.JFrame {
             execution.close();
         }  catch (QueryParseException e) {
             resultTextArea.setText("Error en sintaxis de la consulta\n\n"
+                                    + "Linea: " + e.getLine() + "\n"
+                                    + "Columna: " + e.getColumn() + "\n"
                                     + "ERROR: "
                                     + e.getMessage());
         }
@@ -371,7 +372,9 @@ public class MainWindow extends javax.swing.JFrame {
             result = ResultSetFactory.copyResults(resultAux);
             execution.close();
         } catch (QueryParseException e) {
-            resultTextArea.setText("Error en la sintaxis de la consulta\n\n"
+            resultTextArea.setText("Error en sintaxis de la consulta\n\n"
+                                    + "Linea: " + e.getLine() + "\n"
+                                    + "Columna: " + e.getColumn() + "\n"
                                     + "ERROR: "
                                     + e.getMessage());
         } catch (QueryExceptionHTTP  e) {

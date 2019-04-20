@@ -1,0 +1,69 @@
+1. Obtener el número total de artículos.
+
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms:<http://purl.org/dc/terms/>
+
+select (COUNT(?sujeto) as ?total)
+where {
+        ?sujeto dcterms:type ?objeto .
+        ?objeto rdfs:label "article" .
+}
+
+
+
+2. Obtener el número de artículos para cada una de las revistas por orden creciente de
+número de artículos.
+
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms:<http://purl.org/dc/terms/>
+
+select (COUNT(?articulo) as ?articulos) ?revista
+where {
+	?articulo dcterms:type ?tipoArticulo.
+	?tipoArticulo rdfs:label "article".
+	?articulo dcterms:isPartOf ?a.
+	?a dcterms:isPartOf ?b.
+	?b rdfs:label ?revista.
+	?b dcterms:type ?tipoRevista.
+	?tipoRevista rdfs:label "journal".
+}
+GROUPBY ?revista
+ORDERBY ?articulos
+
+
+
+3. Obtener el título y número de autores de los artículos que poseen más de 8 autores por
+orden decreciente de número de autores.
+
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms:<http://purl.org/dc/terms/>
+
+select (COUNT(?autor) as ?autores) ?titulo
+where {
+	?articulo dcterms:type ?tipoArticulo.
+	?tipoArticulo rdfs:label "article".
+	?articulo dcterms:title ?titulo.
+	?articulo dcterms:creator ?autor.
+}
+GROUP BY (?titulo)
+HAVING (COUNT(?autor) > 8)
+ORDERBY DESC(?autores)
+
+
+
+4. Obtener los 10 autores que más artículos firman por orden decreciente de número de
+artículos firmados.
+
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms:<http://purl.org/dc/terms/>
+
+select (COUNT(?articulo) as ?articulos) ?autor
+where {
+	?articulo dcterms:type ?tipoArticulo.
+	?tipoArticulo rdfs:label "article".
+	?articulo dcterms:creator ?author.
+	?author rdfs:label ?autor.
+}
+GROUP BY (?autor)
+ORDERBY DESC(?articulos)
+LIMIT 10
