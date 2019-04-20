@@ -5,6 +5,10 @@
  */
 package ejercicio3_sparql;
 
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author samu_
@@ -16,6 +20,7 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+        LogCtl.setCmdLogging();
     }
 
     /**
@@ -38,7 +43,6 @@ public class MainWindow extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         selectURLRemoteQueryLabel = new javax.swing.JLabel();
         selectURLRemoteQueryTextField = new javax.swing.JTextField();
-        selectURLRemoteQuerySearchButton1 = new javax.swing.JButton();
         queryLabel = new javax.swing.JLabel();
         resultLabel = new javax.swing.JLabel();
         queryExecuteButton = new javax.swing.JButton();
@@ -46,7 +50,7 @@ public class MainWindow extends javax.swing.JFrame {
         saveOptionsLabel = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
-        jButton1 = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -54,6 +58,11 @@ public class MainWindow extends javax.swing.JFrame {
         selectDataFileRDFLabel.setText("Seleccione el archivo de datos RDF:");
 
         dataFileSearchButton.setText("Buscar");
+        dataFileSearchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataFileSearchButtonActionPerformed(evt);
+            }
+        });
 
         resultTextArea.setColumns(20);
         resultTextArea.setRows(5);
@@ -68,8 +77,6 @@ public class MainWindow extends javax.swing.JFrame {
         selectURLRemoteQueryLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         selectURLRemoteQueryLabel.setText("URL (consultas remotas):");
 
-        selectURLRemoteQuerySearchButton1.setText("Buscar");
-
         queryLabel.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         queryLabel.setText("Consulta");
 
@@ -78,6 +85,11 @@ public class MainWindow extends javax.swing.JFrame {
 
         queryExecuteButton.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         queryExecuteButton.setText("Ejecutar consulta");
+        queryExecuteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                queryExecuteButtonActionPerformed(evt);
+            }
+        });
 
         saveOptionsLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         saveOptionsLabel.setText("Opciones de guardado");
@@ -88,8 +100,8 @@ public class MainWindow extends javax.swing.JFrame {
         buttonGroup.add(jRadioButton2);
         jRadioButton2.setText("jRadioButton2");
 
-        jButton1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jButton1.setText("Guardar");
+        saveButton.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        saveButton.setText("Guardar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -101,7 +113,7 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(saveOptionsLabel)
                     .addComponent(jRadioButton1)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton1)
+                        .addComponent(saveButton)
                         .addComponent(jRadioButton2)))
                 .addGap(34, 34, 34)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -135,8 +147,7 @@ public class MainWindow extends javax.swing.JFrame {
                                                 .addComponent(dataFileSearchButton))
                                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addComponent(selectURLRemoteQueryTextField)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(selectURLRemoteQuerySearchButton1))))
+                                                .addGap(89, 89, 89))))
                                     .addComponent(jSeparator2))
                                 .addGap(27, 27, 27))))
                     .addGroup(layout.createSequentialGroup()
@@ -160,19 +171,18 @@ public class MainWindow extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(selectURLRemoteQueryLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(selectURLRemoteQueryTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(selectURLRemoteQuerySearchButton1))
+                            .addComponent(selectURLRemoteQueryTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(21, 21, 21)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(queryLabel)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(queryLabel, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(resultLabel))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(resultScrollPanel)
                             .addComponent(queryScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                         .addComponent(queryExecuteButton)
                         .addGap(23, 23, 23))))
             .addGroup(layout.createSequentialGroup()
@@ -183,12 +193,40 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jRadioButton2)
                 .addGap(44, 44, 44)
-                .addComponent(jButton1)
+                .addComponent(saveButton)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void dataFileSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataFileSearchButtonActionPerformed
+        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fc.getSelectedFile();
+            if (selectedFile.exists() && selectedFile.isFile() && selectedFile.canRead()) {
+                String absolutePath = fc.getSelectedFile().getAbsolutePath();
+                if (absolutePath.endsWith(".rdf")) {
+                    dataFileTextField.setText(absolutePath);
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "El formato del fichero debe ser rdf (.rdf)",
+                            "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Su elección no es válida",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_dataFileSearchButtonActionPerformed
+
+    private void queryExecuteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_queryExecuteButtonActionPerformed
+        
+    }//GEN-LAST:event_queryExecuteButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -224,12 +262,13 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    
+    private final JFileChooser fc = new JFileChooser();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JButton dataFileSearchButton;
     private javax.swing.JTextField dataFileTextField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JSeparator jSeparator1;
@@ -241,10 +280,10 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JLabel resultLabel;
     private javax.swing.JScrollPane resultScrollPanel;
     private javax.swing.JTextArea resultTextArea;
+    private javax.swing.JButton saveButton;
     private javax.swing.JLabel saveOptionsLabel;
     private javax.swing.JLabel selectDataFileRDFLabel;
     private javax.swing.JLabel selectURLRemoteQueryLabel;
-    private javax.swing.JButton selectURLRemoteQuerySearchButton1;
     private javax.swing.JTextField selectURLRemoteQueryTextField;
     // End of variables declaration//GEN-END:variables
 }
