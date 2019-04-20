@@ -1,0 +1,23 @@
+Buscar las universidades españolas que aparecen en la DBpedia mostrando su nombre en español
+y para aquellas que tiene el rector, mostrarlo también. El endpoint de la DBpedia a utilizar es
+http://dbpedia.org/sparql que se corresponde con la inglesa no la española.
+
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+ 
+select distinct ?universidad ?rector
+where {
+	{
+		?sujeto a dbo:University.
+		?sujeto dbo:country dbr:Spain.
+		?sujeto rdfs:label ?universidad.
+		FILTER (lang(?universidad) = 'es').
+	}
+	OPTIONAL
+	{
+		?sujeto dbo:rector ?objeto.
+		?objeto rdfs:label ?rector.
+		FILTER (lang(?rector) = 'es').
+	}
+}
