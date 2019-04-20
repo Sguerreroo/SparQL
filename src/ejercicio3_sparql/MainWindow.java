@@ -7,14 +7,17 @@ import java.io.OutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.apache.jena.atlas.logging.LogCtl;
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import static org.apache.jena.sparql.resultset.ResultsFormat.FMT_RDF_TURTLE;
 import static org.apache.jena.sparql.resultset.ResultsFormat.FMT_RDF_XML;
@@ -200,24 +203,19 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_dataFileSearchButtonActionPerformed
 
     private void queryExecuteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_queryExecuteButtonActionPerformed
-        final String currentQuery = queryTextArea.getText();
-        ResultSet results = executeQuery(currentQuery, model);
-        if (results != null) {
-            this.query = currentQuery;
-            String resultText = "";
-            if (!results.hasNext())
-                resultText += "La consulta no obtiene ningún resultado.";
-            else
-                while (results.hasNext())
-                    resultText += results.next() + "\n";
-            resultTextArea.setText(resultText);
+        final String url = selectURLRemoteQueryTextField.getText();
+        final String newQuery = queryTextArea.getText();
+        if (url.isEmpty()) {
+            ResultSet results = executeLocalQuery(newQuery, model);
+            showResults(results, newQuery);
         } else {
-            this.query = "";
+            ResultSet results = executeRemoteQuery(newQuery, url);
+            showResults(results, newQuery);
         }
     }//GEN-LAST:event_queryExecuteButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        if (!query.isEmpty()) {
+        if (!validatedQuery.isEmpty()) {
             String[] possibleFormats = { "XML", "Turtle", "JSON", "Plain Text"};
             String selectedValue = String.valueOf(JOptionPane.showInputDialog(
                                     this,
@@ -297,7 +295,7 @@ public class MainWindow extends javax.swing.JFrame {
     
     private final JFileChooser fc = new JFileChooser();
     private Model model;
-    private String query = "";
+    private String validatedQuery = "";
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton dataFileSearchButton;
     private javax.swing.JTextField dataFileTextField;
@@ -326,7 +324,7 @@ public class MainWindow extends javax.swing.JFrame {
         saveFile = new File(saveFilePath);
         try {
             os = new FileOutputStream(saveFile);
-            ResultSet result = executeQuery(query, model);
+            ResultSet result = executeLocalQuery(validatedQuery, model);
             if (result != null)
                 ResultSetFormatter.output(os, result, format);
         } catch (FileNotFoundException ex) {
@@ -338,7 +336,7 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }
     
-    private ResultSet executeQuery(String query, Model model) {
+    private ResultSet executeLocalQuery(String query, Model model) {
         ResultSet resultAux;
         ResultSet result = null;
         try (QueryExecution execution = QueryExecutionFactory.create(query, model)) {
@@ -351,5 +349,37 @@ public class MainWindow extends javax.swing.JFrame {
                                     + e.getMessage());
         }
         return result;
+    }
+    
+    private ResultSet executeRemoteQuery(String queryString, String url) {
+        ResultSet resultAux;
+        ResultSet result = null;
+        Query query = QueryFactory.create(queryString);
+        try (QueryExecution execution = QueryExecutionFactory.sparqlService(url, query)) {
+            ((QueryEngineHTTP) execution).addParam("timeout", "10000");
+            resultAux = execution.execSelect();
+            result = ResultSetFactory.copyResults(resultAux);
+            execution.close();
+        }   catch (QueryParseException e) {
+            resultTextArea.setText("Error en sintaxis de la consulta\n\n"
+                                    + "ERROR: "
+                                    + e.getMessage());
+        }
+        return result;
+    }
+
+    private void showResults(ResultSet results, String newQuery) {
+        if (results != null) {
+            this.validatedQuery = newQuery;
+            String resultText = "";
+            if (!results.hasNext())
+                resultText += "La consulta no obtiene ningún resultado.";
+            else
+                while (results.hasNext())
+                    resultText += results.next() + "\n";
+            resultTextArea.setText(resultText);
+        } else {
+            this.validatedQuery = "";
+        }
     }
 }
