@@ -8,6 +8,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.apache.jena.atlas.logging.LogCtl;
 import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
@@ -30,8 +31,6 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         initComponents();
         LogCtl.setCmdLogging();
-        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\palaeontology_articles-reducido\\palaeontology_articles-reducido.rdf");                
-//        model = RDFDataMgr.loadModel("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\datos-ejemplo-sparql\\datos-sparql-2018-19.ttl");
     }
 
     @SuppressWarnings("unchecked")
@@ -59,7 +58,6 @@ public class MainWindow extends javax.swing.JFrame {
         selectDataFileRDFLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         selectDataFileRDFLabel.setText("Seleccione el archivo de datos RDF:");
 
-        dataFileTextField.setText("C:\\Users\\samu_\\Desktop\\SI2\\SemanticWeb\\Pratises\\Ejercicio3_ConsultasConSPARQL\\datos-ejemplo-sparql\\datos-sparql-2018-19.ttl");
         dataFileTextField.setEnabled(false);
 
         dataFileSearchButton.setText("Buscar");
@@ -76,7 +74,6 @@ public class MainWindow extends javax.swing.JFrame {
 
         queryTextArea.setColumns(20);
         queryTextArea.setRows(5);
-        queryTextArea.setText("PREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX eg: <http://www.si2.com/si2/>\n\nselect ?titulo ?coleccion\nwhere {\n\t?libro dc:title ?titulo.\n\t?libro dc:isPartOf ?coleccion.\n}\n");
         queryScrollPanel.setViewportView(queryTextArea);
 
         selectURLRemoteQueryLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
@@ -206,15 +203,24 @@ public class MainWindow extends javax.swing.JFrame {
     private void queryExecuteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_queryExecuteButtonActionPerformed
         final String url = selectURLRemoteQueryTextField.getText();
         final String newQuery = queryTextArea.getText();
+        
         if (url.isEmpty()) {
-            this.remote = false;
-            ResultSet results = executeLocalQuery(newQuery, model);
-            showResultsInTextArea(results, newQuery, "");
+            if (model != null) {
+                this.remote = false;
+                ResultSet results = executeLocalQuery(newQuery, model);
+                showResultsInTextArea(results, newQuery, "");
+            } else
+            JOptionPane.showMessageDialog(
+                        null,
+                        "Debes introducir un archivo de datos válido para ejecutar una consulta",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE);
         } else {
             this.remote = true;
             ResultSet results = executeRemoteQuery(newQuery, url);
             showResultsInTextArea(results, newQuery, url);
-        }
+        }            
+        
     }//GEN-LAST:event_queryExecuteButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
@@ -379,6 +385,10 @@ public class MainWindow extends javax.swing.JFrame {
                                     + "ERROR: "
                                     + e.getMessage());
         } catch (QueryExceptionHTTP  e) {
+            resultTextArea.setText("Error en el endpoint\n\n"
+                                    + "ERROR: "
+                                    + e.getMessage());
+        } catch (QueryException e) {
             resultTextArea.setText("Error en el endpoint\n\n"
                                     + "ERROR: "
                                     + e.getMessage());

@@ -122,7 +122,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="dataFileTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005csamu_\u005cDesktop\u005cSI2\u005cSemanticWeb\u005cPratises\u005cEjercicio3_ConsultasConSPARQL\u005cdatos-ejemplo-sparql\u005cdatos-sparql-2018-19.ttl" containsInvalidXMLChars="true"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
@@ -163,7 +162,6 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;&#xa;PREFIX eg: &lt;http://www.si2.com/si2/&gt;&#xa;&#xa;select ?titulo ?coleccion&#xa;where {&#xa;&#x9;?libro dc:title ?titulo.&#xa;&#x9;?libro dc:isPartOf ?coleccion.&#xa;}&#xa;"/>
           </Properties>
         </Component>
       </SubComponents>
